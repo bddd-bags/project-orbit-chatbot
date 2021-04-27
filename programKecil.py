@@ -121,7 +121,7 @@ def extractTask(query, validTask, stringMatching):
 
     #Referensi regex buat ambil consecutive capitalized word: https://stackoverflow.com/questions/31570699/regex-to-get-consecutive-capitalized-words-with-one-or-more-words-doesnt-work
     #matkulPattern = re.compile(r'((?:[Mm]atkul|[Mm]ata [Kk]uliah)|[a-zA-Z]{2}\d{4})\s?([A-Za-z\s]*)?\s?([Tt]opik)\s(\b(?:[A-Z][a-z]*\b\s*)+)')
-    matkulPattern = re.compile(r'\b(?:[A-Z][a-z]*\b\s*\d?)+')
+    matkulPattern = re.compile(r'(\b(?:[A-Z][a-z]*\b\s*\d?)+|[A-Z]{2}\d{4})')
     datePattern = re.compile(r'(\d{2}.\d{2}.\d{4}|\d{2}.(?:[Jj]anuari|[Ff]ebruari|[Mm]aret|[Aa]pril|[Mm]ei|[Jj]uni|[Jj]uli|[Aa]gustus|[Ss]eptember|[Oo]ktober|[Nn]ovember|[Dd]esember).\d{4})')
     topikPattern = re.compile(r'\b(?:[A-Z][a-z]*\b\s*\d)+')
     
@@ -210,6 +210,11 @@ def extractTask(query, validTask, stringMatching):
 #         print("Perintah tidak dikenali")
 
 
+#Input nama matkul harus diawali pake kata 'matkul'/'mata kuliah'
+#Input nama topik harus diawali kata 'topik'
+#Kalau dalam satu input ada nama matkul dan topik, inputnya harus berurutan matkul terus topik
+#Input nama matkul(kecuali kalau inputnya kode matkul) sama topik matkul harus selalu diawali huruf kapital
+#ex: Aku mau lihat deadline Matkul IF2211 topik Dynamic Programming
 
 
 jenisTask = ["Tubes","Tucil","Praktikum","Ujian","Kuis"]
