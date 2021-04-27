@@ -1,8 +1,10 @@
-def checkSufPrefKMP(pattern, i):
+def checkSufPrefKMP(patternInput, i):
+    pattern = patternInput.lower()
     #Fungsi buat cek pasangan suffix dan prefix dalam algoritma KMP
     return (pattern[0:i] ==  pattern[len(pattern)-i:len(pattern)])
 
-def buildFail(pattern):
+def buildFail(patternInput):
+    pattern = patternInput.lower()
     #Fungsi preproses
     #Dipake buat bikin array yang isinya angka start algoritma KMP kalau ada mismatch
     result = [0 for i in range(len(pattern))]
@@ -16,7 +18,9 @@ def buildFail(pattern):
         result[i] = temp
     return result
 
-def stringMatchingKMP(text, pattern):
+def stringMatching(textInput, patternInput):
+    text = textInput.lower()
+    pattern = patternInput.lower()
     fail = buildFail(pattern)
     i = 0
     j = i
@@ -37,11 +41,3 @@ def stringMatchingKMP(text, pattern):
             i += 1
     #Not found
     return -1
-
-#Test
-string = "Makan ikan bakar itu enak sekali gaes mantap pisan"
-pattern = "ikan"
-result = stringMatchingKMP(string,pattern)
-if (result != -1):
-    print("String ditemukan pada posisi indeks teks ke", result)
-    print("String yang ditemukan adalah",string[result:result+len(pattern)])

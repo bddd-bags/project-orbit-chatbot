@@ -1,4 +1,5 @@
-def buildLast(pattern):
+def buildLast(patternInput):
+    pattern = patternInput.lower()
     #Jumlah karakter ASCII ada 128
     last = [-1 for i in range(128)]
     for index, char in enumerate(pattern):
@@ -6,7 +7,10 @@ def buildLast(pattern):
         last[ord(char)] = index
     return last
 
-def stringMatchingBM(text, pattern):
+def stringMatching(textInput, patternInput):
+    text = textInput.lower()
+    pattern = patternInput.lower()
+
     j = len(pattern)-1
     i = j
     n = len(text)
@@ -28,11 +32,3 @@ def stringMatchingBM(text, pattern):
             j = m - 1
     #not found
     return -1
-
-#Test
-string = "Makan ikan bakar itu enak sekali gaes mantap pisan"
-pattern = "ikan"
-result = stringMatchingBM(string,pattern)
-if (result != -1):
-    print("String ditemukan pada posisi indeks teks ke", result)
-    print("String yang ditemukan adalah",string[result:result+len(pattern)])
