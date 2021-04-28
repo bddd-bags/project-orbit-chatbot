@@ -57,7 +57,7 @@ h3 {
 .userText span {
     background-color: #009688;
     padding: 10px;
-    border-radius: 2px;
+    border-radius: 25px;
 }
 
 .botText {
@@ -71,6 +71,6 @@ h3 {
 .botText span {
     background-color: #EF5350;
     padding: 10px;
-    border-radius: 2px;
+    border-radius: 25px;
 }
 
