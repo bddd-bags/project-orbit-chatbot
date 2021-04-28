@@ -36,7 +36,7 @@ def missWordRecc(text, kataPenting, missThreshold, result):
         for keyword in kataPenting:
             editDistance = levenshteinDistance(mismatch.lower(),keyword.lower())
             mismatchPercentage = float(editDistance/max(len(keyword),len(mismatch)))
-            if (mismatchPercentage <= missThreshold and mismatchPercentage > 0):
+            if (mismatchPercentage < missThreshold and mismatchPercentage > 0):
                 print("mismatch percentage",mismatchPercentage)
                 print(keyword)
                 print("editdistance: ", editDistance)
