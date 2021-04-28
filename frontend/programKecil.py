@@ -343,6 +343,10 @@ def filterDBTask(taskDB, filter, keyWord):
         for task in (taskDB):
             if (task.status == keyWord):
                 result.append(task)
+    if filter == "normal":
+        for task in (taskDB):
+            if (isDate1GreaterEQ(task.deadline,keyWord)):
+                result.append(task)
 
     return result
 
@@ -366,6 +370,8 @@ def isTaskExist(task, key):
 
 
 def commandValidation(mainCommand,additionalCommand,mainCommandList, additionalCommandList,task, attributeTask,nHariPekan, stringMatching, taskFromDB):
+    taskFromDB = filterDBTask(taskFromDB, "normal",datetime.today().strftime('%d/%m/%Y'))
+    taskFromDB = filterDBTask(taskFromDB, "status deadline",0)
     # print("Masuk validation")
     case2c = False
     print(task)
