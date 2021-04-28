@@ -38,12 +38,14 @@ h3 {
     border-bottom: 3px solid #009688;
     font-family: monospace;
     font-size: 17px;
+    border-radius: 10px;
 }
 
 #buttonInput {
     padding: 3px;
     font-family: monospace;
     font-size: 17px;
+    border-radius: 10px;
 }
 
 .userText {
@@ -73,4 +75,3 @@ h3 {
     padding: 10px;
     border-radius: 25px;
 }
-
