@@ -2,6 +2,7 @@ from flask import Flask,render_template,request
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from programKecil import *
+from levenshteinDistance import *
 
 app = Flask(__name__) 
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///test.db"
@@ -60,6 +61,14 @@ def get_bot_response():
      taskFromDB = Todo.query.order_by(Todo.deadline).all() 
      print("hello")
      print(todoToList(taskFromDB))
+
+     MISS_THRESHOLD = 0.25 #ini maksudnya 75% match
+     checkMissmatch = missWordRecc(query, mainCommandList, MISS_THRESHOLD)
+     checkMissmatch = missWordRecc(" ".join(checkMissmatch[1]), additionalCommandList, MISS_THRESHOLD)
+
+     if checkMissmatch[0]:
+          print(" ".join(checkMissmatch[1]))
+          return "Mungkin maksud anda: <i>" + " ".join(checkMissmatch[1]) +"<i>?"
 
      
      
