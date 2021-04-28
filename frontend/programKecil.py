@@ -2,9 +2,9 @@ import re
 import stringMatchingBM as bm
 import stringMatchingKMP as kmp
 import levenshteinDistance as ld
-# from flask_sqlalchemy import SQLAlchemy
-# from app import db, Todo
-# from datetime import datetime, timedelta
+from flask_sqlalchemy import SQLAlchemy
+from app import db, Todo
+from datetime import datetime, timedelta
 
 def convertDateFormat(date):
     temp = date.split()

@@ -12,21 +12,39 @@ def levenshteinDistance(stringA,stringB):
                     distanceMatrix[i][j] += 1 
     return distanceMatrix[len(stringB)-1][len(stringA)-1]
 
+def LD(s, t):
+    if s == "":
+        return len(t)
+    if t == "":
+        return len(s)
+    if s[-1] == t[-1]:
+        cost = 0
+    else:
+        cost = 1
+       
+    res = min([LD(s[:-1], t)+1,
+               LD(s, t[:-1])+1, 
+               LD(s[:-1], t[:-1]) + cost])
+
+    return res
+
 def missWordRecc(text, kataPenting, missThreshold, result):
     # result = [[0],[]]
     
     for count, mismatch in enumerate((text.split())):
         foundMismatch = False
         for keyword in kataPenting:
-            editDistance = levenshteinDistance(mismatch,keyword)
+            editDistance = levenshteinDistance(mismatch.lower(),keyword.lower())
             mismatchPercentage = float(editDistance/max(len(keyword),len(mismatch)))
             if (mismatchPercentage <= missThreshold and mismatchPercentage > 0):
                 print("mismatch percentage",mismatchPercentage)
+                print(keyword)
+                print("editdistance: ", editDistance)
                 result[1].append(keyword)
                 foundMismatch = True
                 result[0] = 1
                 break
-        if (not foundMismatch):
+        if (not foundMismatch and mismatch not in result[1]):
             result[1].append(mismatch)
     if (result):
         return result
