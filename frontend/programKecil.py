@@ -631,7 +631,7 @@ additionalCommandList = ["Hari", "Minggu", "Hari Ini","Task"]
 # commandValidationTest(mainCommand, additionalCommand,mainCommandList,additionalCommandList, tasks, attributeTask,nHariPekan, bm.stringMatching)
 
 query = "deadlie ku kelewat batas"
-print(ld.missWordRecc(query,mainCommandList,0.25))
+# print(ld.missWordRecc(query,mainCommandList,0.25))
 
 
 

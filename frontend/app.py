@@ -62,13 +62,15 @@ def get_bot_response():
      print("hello")
      print(todoToList(taskFromDB))
 
-     MISS_THRESHOLD = 0.25 #ini maksudnya 75% match
-     checkMissmatch = missWordRecc(query, mainCommandList, MISS_THRESHOLD)
-     checkMissmatch = missWordRecc(" ".join(checkMissmatch[1]), additionalCommandList, MISS_THRESHOLD)
+     # checkMissmatch = [0,[]]
+     # MISS_THRESHOLD = 0.25 #ini maksudnya 75% match
+     # checkMissmatch = missWordRecc(query, mainCommandList, MISS_THRESHOLD,checkMissmatch)
+     # checkMissmatch = missWordRecc(" ".join(checkMissmatch[1]), additionalCommandList, MISS_THRESHOLD,checkMissmatch)
 
-     if checkMissmatch[0]:
-          print(" ".join(checkMissmatch[1]))
-          return "Mungkin maksud anda: <i>" + " ".join(checkMissmatch[1]) +"<i>?"
+     # if (checkMissmatch[0]):
+     #      print("checkMisssmath", checkMissmatch[0])
+     #      print(" ".join(checkMissmatch[1]))
+     #      return "Mungkin maksud anda: <i>" + " ".join(checkMissmatch[1]) +"<i>?"
 
      
      
