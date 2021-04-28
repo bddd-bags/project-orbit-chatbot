@@ -1,6 +1,6 @@
 body {
     font-family: Garamond;
-    background: #f5a05c
+    background: #f5a05c;
 }
 
 h1 {
@@ -21,7 +21,7 @@ h3 {
 #chatbox {
     margin-left: auto;
     margin-right: auto;
-    width: 40%;
+    width: 800px;
     margin-top: 60px;
 }
 
