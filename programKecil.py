@@ -133,8 +133,9 @@ def extractTask(query, deadlineTask,normalTask, stringMatching):
     idPattern = re.compile(r'[Tt]ask\s\d*')
     matkulPattern = re.compile(r'(\b(?:[A-Z][a-z]*\b\s*\d?)+|[A-Z]{2}\d{4})')
     datePattern = re.compile(r'(\d{2}.\d{2}.\d{4}|\d{2}.(?:[Jj]anuari|[Ff]ebruari|[Mm]aret|[Aa]pril|[Mm]ei|[Jj]uni|[Jj]uli|[Aa]gustus|[Ss]eptember|[Oo]ktober|[Nn]ovember|[Dd]esember).\d{4})')
-    topikPattern = re.compile(r'\b(?:[A-Z][a-z]*\b\s*\d)+')
-    
+    # topikPattern = re.compile(r'\b(?:[A-Z][a-z]*\b\s*\d)+')
+    topikPattern = re.compile(r'(\b(?:[A-Z][a-z]*\b\s*\d?)+|[A-Z]{2}\d{4})')
+    # topikPattern = re.compile(r'^topik\s')
 
 
     #Add task from query
@@ -177,7 +178,7 @@ def extractTask(query, deadlineTask,normalTask, stringMatching):
 
     #Add topik
     if(index2 != -1):
-        tempData = matkulPattern.findall(query[index2+len("topik")+1:])
+        tempData = topikPattern.findall(query[index2+len("topik")+1:])
         if (tempData):
             task["topik"].append(" ".join(tempData).strip())
 
@@ -205,7 +206,7 @@ def extractTask(query, deadlineTask,normalTask, stringMatching):
         if (stringMatching(query,macamTask)+1):
             task["jenis"].append(macamTask)
             #Add status to unfinished
-            task["status"].append("-1")
+            # task["status"].append("-1")
     
     #Ini bisi ga perlu sih
 
@@ -297,6 +298,23 @@ def isCommandOnlyX(userCommand, commandX, commandDB, stringMatching):
                 return False
     return False
 
+def isCommandOnlyXandY(userCommand, commandX,commandY, commandDB, stringMatching):
+    commandIndex1 = commandToIndex(commandX, commandDB, stringMatching)
+    commandIndex2 = commandToIndex(commandY, commandDB, stringMatching)
+    if  (commandIndex1+1 and commandIndex2+1):
+        # print("panjang command 1", len(userCommand[commandIndex1]))
+        # print("panjang command 2", len(userCommand[commandIndex2]))
+        if len(userCommand[commandIndex1]) != len(userCommand[commandIndex2]):
+            return False
+        if len(userCommand[commandIndex1]) == 0 or len(userCommand[commandIndex2]) == 0:
+            return False
+        if (len(userCommand[commandIndex1]) == len(userCommand[commandIndex2]) and len(userCommand[commandIndex1]) != 0):
+            for count, availableCommand in enumerate(userCommand):
+                if len(availableCommand)!= 0:
+                    if availableCommand[0] != commandX and availableCommand[0] != commandY:
+                        return False
+    return True
+
 
 def commandValidation(mainCommand,additionalCommand,mainCommandList, additionalCommandList,task, attributeTask,nHariPekan, stringMatching):
     print("Masuk validation")
@@ -304,6 +322,8 @@ def commandValidation(mainCommand,additionalCommand,mainCommandList, additionalC
     if ((isCommandEmpty(mainCommand) or isCommandOnlyX(mainCommand,"deadline",mainCommandList,stringMatching)) and isCommandEmpty(additionalCommand)):
         if(isTaskInputComplete(task)):
             print("Case 1! Jalankan fungsi add task")
+            #masih ngebug, sementara tanganin pake return
+            return
             #tambahin fungsi add task ke sini
         elif(isCommandOnlyX(mainCommand,"deadline",mainCommandList,stringMatching)):
             print("skip case 1")
@@ -311,8 +331,12 @@ def commandValidation(mainCommand,additionalCommand,mainCommandList, additionalC
             #tasknya kaga lengkap/invalid
             #tambahin pesan kesalahan di sini
             print("Maaf perintah kamu kurang tepat. Task kamu tidak lengkap!")
+    #case 4 (ditaruh di sini karena suatu hal)
+    if (isCommandOnlyXandY(mainCommand,"Deadline","Diundur",mainCommandList,stringMatching)):
+        print("Case 4! Jalankan fungsi update deadline task!")
+
     #case 2
-    if(isCommandOnlyX(mainCommand,"deadline",mainCommandList,stringMatching)):
+    elif(isCommandOnlyX(mainCommand,"deadline",mainCommandList,stringMatching)):
         #2.c harus di atas soalnya dia bisa digabung sama yang lain
         # print(isTaskOnlyX(task, "jenis", attributeTask,stringMatching))
         if (isTaskOnlyX(task, "jenis", attributeTask, stringMatching) != -1):
@@ -342,8 +366,11 @@ def commandValidation(mainCommand,additionalCommand,mainCommandList, additionalC
 
         
         # elif
-        
-        # elif 
+    
+    #case 5
+    elif(isCommandOnlyX(mainCommand,"selesai",mainCommandList,stringMatching)):
+        print("Case 5! jalankan fungsi update task selesai")
+
     else:
         #perintah tidak dikenali
         print("Perintah kamu tidak dikenali!")
@@ -362,7 +389,7 @@ additionalCommandList = ["Hari", "Minggu", "Hari Ini","Task"]
 # query = input("Masukkan perintah: ")
 
 #test case 1
-# query = "bot, tolong ingetin kalau ada deadline tucil matkul IF2211 topik Pemrograman dikumpul 10 April 2020"
+query = "bot, tolong ingetin kalau ada deadline tucil matkul IF2211 topik Pemrograman dikumpul 10 April 2020"
 
 
 #test case 2a
@@ -380,8 +407,12 @@ additionalCommandList = ["Hari", "Minggu", "Hari Ini","Task"]
 #test case 2b4
 # query = "deadline hari ini"
 
-#test case 2c
+# test case 2c
 # query = "deadline tubes dari tanggall 20/04/2020 sampai tanggal 21/05/2020"
+# query = "deadline tucil 5 hari ke depan"
+# query = "deadline tubes 5 minggu ke depan"
+# query = "deadline tucil hari ini"
+
 
 # test case 3
 # baru jalan kalau pake nama matkul. PR: tambahin kalau yang dimasukin ID task; eh udah jalan, ga tahu kenapa wkwkk
@@ -389,7 +420,10 @@ additionalCommandList = ["Hari", "Minggu", "Hari Ini","Task"]
 # query = "kapan deadline task 10?"
 
 #test case 4
-query = "task 4 diundur jadi 20/04/2020"
+# query = "deadline task 4 diundur jadi 20/04/2020"
+
+#test case 5
+# query = "task 5 selesai"
 
 mainCommand = parseCommand(query,mainCommandList, bm.stringMatching)
 additionalCommand = parseCommand(query,additionalCommandList, bm.stringMatching)
@@ -404,6 +438,7 @@ print("ini main command:", mainCommand)
 print("ini additional command:", additionalCommand)
 print("ini hasil ekstraksi N hari atau minggu:",nHariPekan)
 print("ini task:",tasks)
+print("Testing fungsi cocokin 2 command",isCommandOnlyXandY(mainCommand, "Deadline","Diundur", mainCommandList, bm.stringMatching))
 commandValidation(mainCommand, additionalCommand,mainCommandList,additionalCommandList, tasks, attributeTask,nHariPekan, bm.stringMatching)
 
 
