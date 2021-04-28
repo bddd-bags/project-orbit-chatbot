@@ -1,5 +1,5 @@
 def buildLast(patternInput):
-    pattern = patternInput.lower()
+    pattern = patternInput.lower().strip()
     #Jumlah karakter ASCII ada 128
     last = [-1 for i in range(128)]
     for index, char in enumerate(pattern):
@@ -8,8 +8,8 @@ def buildLast(patternInput):
     return last
 
 def stringMatching(textInput, patternInput):
-    text = textInput.lower()
-    pattern = patternInput.lower()
+    text = textInput.lower().strip()
+    pattern = patternInput.lower().strip()
 
     j = len(pattern)-1
     i = j

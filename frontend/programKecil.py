@@ -3,7 +3,8 @@ import stringMatchingBM as bm
 import stringMatchingKMP as kmp
 import levenshteinDistance as ld
 from flask_sqlalchemy import SQLAlchemy
-
+from app import db, Todo
+from datetime import datetime, timedelta
 
 def convertDateFormat(date):
     temp = date.split()
@@ -170,7 +171,7 @@ def extractTask(query, deadlineTask,normalTask, stringMatching):
     index2 = stringMatching(query,"topik") #Ini kepake juga buat topik
     if(index != -1):
         if (index2 != -1):
-            task["matkul"].append(query[index+len(ejaMatkul)+1:index2-1])
+            task["matkul"].append(query[index+len(ejaMatkul)+1:index2-1].strip())
 
         #Pake metode regex
         else:
@@ -226,6 +227,51 @@ def extractNHariPekan(query):
             if N.isdigit():
                 result.append(int(N))
     return result
+
+def isDate1GreaterEQ(date1,date2):
+    year1 = int(date1[6:10])
+    year2 = int(date2[6:10])
+
+    month1 = int(date1[3:5])
+    month2 = int(date2[3:5])
+
+    day1 = int(date1[0:2])
+    day2 = int(date2[0:2])
+
+    if year1 > year2:
+        return True
+    if month1 > month2 and year1 == year2:
+        return True
+    if day1 >= day2 and year1 == year2 and month1 == month2:
+        return True
+    return False
+
+def isDate1LowerEQ(date1,date2):
+    year1 = int(date1[6:10])
+    year2 = int(date2[6:10])
+
+    month1 = int(date1[3:5])
+    month2 = int(date2[3:5])
+
+    day1 = int(date1[0:2])
+    day2 = int(date2[0:2])
+
+    if year1 < year2:
+        return True
+    if month1 < month2 and year1 == year2:
+        return True
+    if day1 <= day2 and month1 == month2 and year1 == year2:
+        return True
+    return False
+
+def weekToDays(week):
+    return week*7
+
+def todayPlusN(nDays):
+    resultDate = datetime.now() + timedelta(days=nDays)  
+    return resultDate.strftime('%d/%m/%Y')
+
+
 
 #TEST MAIN PROGRAM
 
@@ -319,19 +365,23 @@ def isCommandOnlyXandY(userCommand, commandX,commandY, commandDB, stringMatching
 
 
 def taskDBToString(taskDB):
-    result = ""
+    result = "[Daftar Task Punya Kamu]<br>"
     for num, task in enumerate(taskDB):
-        result += str(num+1)+". "
+        result += " "+ str(num+1)+". "
         result += "(ID: " + str(task.id) +") "
         result += task.deadline + " - "
         result += task.matkul + " - "
         result += task.jenis + " - "
-        result += task.topik + " - "#+ "BBBBBBBBBBBBBBBBBBBBBBBBB"
-        result += "       "
+        result += task.topik
+        result += "<br>"
     return result
 
 def filterDBTask(taskDB, filter, keyWord):
     result = []
+    if filter == "id":
+        for task in (taskDB):
+            if (str(task.id) == keyWord):
+                result.append(task)
     if filter == "matkul":
         for task in (taskDB):
             if (task.matkul == keyWord):
@@ -340,15 +390,44 @@ def filterDBTask(taskDB, filter, keyWord):
         for task in (taskDB):
             if (task.jenis == keyWord):
                 result.append(task)
+    if filter == "deadline hari ini":
+        for task in (taskDB):
+            if (task.deadline == keyWord):
+                result.append(task)
+    if filter == "deadline antara":
+        for task in (taskDB):
+            if (isDate1LowerEQ(task.deadline,keyWord) and isDate1GreaterEQ(task.deadline,datetime.today().strftime('%d/%m/%Y'))):
+                result.append(task)
+    if filter == "status deadline":
+        for task in (taskDB):
+            if (task.status == keyWord):
+                result.append(task)
+
     return result
+
+def filterDBTaskTwoDate(taskDB,date1,date2):
+    result = []
+    for task in (taskDB):
+        if (isDate1LowerEQ(task.deadline,date2) and isDate1GreaterEQ(task.deadline,date1)):
+            result.append(task)
+    return result
+
+def addNewTask(newTask):
+    newT = Todo(newTask["matkul"][0],newTask["jenis"][0], newTask["topik"][0],newTask["deadline"][0],0) #param terakhirnya perlu diupdate
+    db.session.add(newT)
+    db.session.commit()
 
 
 def commandValidation(mainCommand,additionalCommand,mainCommandList, additionalCommandList,task, attributeTask,nHariPekan, stringMatching, taskFromDB):
-    print("Masuk validation")
+    # print("Masuk validation")
+    print(task)
+    # print("panjang char matkul:", len(task["matkul"][0]))
+
     #case 1 (kayanya ini nanti taruh bawah sih kalau udah kelar)
     if ((isCommandEmpty(mainCommand) or isCommandOnlyX(mainCommand,"deadline",mainCommandList,stringMatching)) and isCommandEmpty(additionalCommand)):
         if(isTaskInputComplete(task)):
-            output = "Case 1! Jalankan fungsi add task"
+            output = "[TASK BERHASIL DICATAT]<br>"+"(ID: " + str(len(taskFromDB)+1) +") " +str(task["deadline"][0]) +" - " +str(task["matkul"][0]) +" - " +str(task["jenis"][0]) +" - " +str(task["topik"][0])
+            addNewTask(task)
             return output
             #masih ngebug, sementara tanganin pake return
             #tambahin fungsi add task ke sini
@@ -360,6 +439,15 @@ def commandValidation(mainCommand,additionalCommand,mainCommandList, additionalC
             print("Maaf perintah kamu kurang tepat. Task kamu tidak lengkap!")
     #case 4 (ditaruh di sini karena suatu hal)
     if (isCommandOnlyXandY(mainCommand,"Deadline","Diundur",mainCommandList,stringMatching)):
+        #belum disimpan tapi ya
+        idx = int(task["id"][0])
+        update = Todo.query.filter_by(id=idx).first()
+        update.deadline = task["deadline"][0]
+        db.session.commit()
+
+
+        # temp = filterDBTask(taskFromDB,"id",task["id"][0])
+        return "Task "+ str(idx)+" berhasil diperbaharui"
         print("Case 4! Jalankan fungsi update deadline task!")
 
     #case 2
@@ -376,23 +464,46 @@ def commandValidation(mainCommand,additionalCommand,mainCommandList, additionalC
         #2.b1
         elif (isCommandOnlyX(mainCommand,"deadline",mainCommandList,stringMatching) and isTaskOnlyX(task,"deadline",attributeTask, stringMatching) == 2):
             print("Case 2.b1! Jalankan fungsi menampilkan task di antara dua buah tanggal!")
+            filteredTask = (filterDBTaskTwoDate(taskFromDB, task["deadline"][0],task["deadline"][1]))
+            if (filteredTask):
+                return taskDBToString(filteredTask)
+            else:
+                return "Mantap pak bos, dari tanggal "+task["deadline"][0]+" sampai tanggal "+ task["deadline"][1]+" enggak ada deadline!"
         elif(isCommandOnlyX(mainCommand,"deadline",mainCommandList,stringMatching) and len(nHariPekan) == 1):
             #2.b2
             if(isCommandOnlyX(additionalCommand,"hari",additionalCommandList,stringMatching)):
+                filteredTask = (filterDBTask(taskFromDB,"deadline antara",todayPlusN(nHariPekan[0])))
+                if (filteredTask):
+                    return taskDBToString(filteredTask)
+                else:
+                    return "Mantap pak bos, "+str(nHariPekan[0])+" hari ke depan enggak ada deadline!"
                 print("Case 2.b2! Jalankan fungsi menampilkan task N hari dari sekarang!")
             #2.b3
             if(isCommandOnlyX(additionalCommand,"minggu",additionalCommandList,stringMatching)):
+                filteredTask = (filterDBTask(taskFromDB,"deadline antara",todayPlusN(weekToDays(nHariPekan[0]))))
+                if (filteredTask):
+                    return taskDBToString(filteredTask)
+                else:
+                    return "Mantap pak bos, "+str(nHariPekan[0])+" minggu ke depan enggak ada deadline!"
                 print("Case 2.b3! Jalankan fungsi menampilkan task N minggu dari sekarang!")
         #2.b4
         elif(isCommandOnlyX(additionalCommand,"hari ini",additionalCommandList,stringMatching)):
+            filteredTask = (filterDBTask(taskFromDB,"deadline hari ini",todayPlusN(0)))
+            if (filteredTask):
+                return taskDBToString(filteredTask)
+            else:
+                return "Mantap pak bos, hari ini enggak ada deadline!"
             print("Case 2.b4! Jalankan fungsi menampilkan task hari ini")
         
         #case 3
         #tambahin fungsi buat nyari ID sama validasi inputnya cm ada ID
         elif (isTaskOnlyX(task,"matkul",attributeTask,stringMatching)):
             # filterDBTask(taskFromDB,"matkul",task["matkul"][0])
-            # return filterDBTask(taskFromDB,"matkul",task["matkul"][0])[0].tanggal
+            # masih kurang yang ID
+            print(task)
             print("Case 3! Jalankan fungsi search matkul by ID/Nama matkul")
+            return taskDBToString(filterDBTask(taskFromDB,"matkul",task["matkul"][0]))
+            
 
         
 
@@ -402,16 +513,21 @@ def commandValidation(mainCommand,additionalCommand,mainCommandList, additionalC
     #case 5
     elif(isCommandOnlyX(mainCommand,"selesai",mainCommandList,stringMatching)):
         print("Case 5! jalankan fungsi update task selesai")
+        idx = int(task["id"][0])
+        update = Todo.query.filter_by(id=idx).first()
+        update.status = 1
+        db.session.commit()
+        return "Task "+ str(idx)+" telah ditandai selesai"
 
     else:
         #perintah tidak dikenali
         print("Perintah kamu tidak dikenali!")
+        # return str(isDate1GreaterEQ("12/03/2021", "13/03/2021"))
         return "waduh, botnya bingung bang. Coba ketik help deh!"
     return
 
 
 
-def commandValidationTest(mainCommand,additionalCommand,mainCommandList, additionalCommandList,task, attributeTask,nHariPekan, stringMatching):
     print("Masuk validation")
     #case 1 (kayanya ini nanti taruh bawah sih kalau udah kelar)
     if ((isCommandEmpty(mainCommand) or isCommandOnlyX(mainCommand,"deadline",mainCommandList,stringMatching)) and isCommandEmpty(additionalCommand)):
@@ -474,7 +590,7 @@ def commandValidationTest(mainCommand,additionalCommand,mainCommandList, additio
     else:
         #perintah tidak dikenali
         print("Perintah kamu tidak dikenali!")
-        return "waduh, botnya bingung bang. Coba ketik help deh!"
+        return
     return
 
 
@@ -517,7 +633,7 @@ additionalCommandList = ["Hari", "Minggu", "Hari Ini","Task"]
 
 # test case 3
 # baru jalan kalau pake nama matkul. PR: tambahin kalau yang dimasukin ID task; eh udah jalan, ga tahu kenapa wkwkk
-query = "kapan deadline matkul IF2211?"
+# query = "kapan deadline matkul IF2211?"
 # query = "kapan deadline task 10?"
 
 #test case 4
@@ -526,21 +642,26 @@ query = "kapan deadline matkul IF2211?"
 #test case 5
 # query = "task 5 selesai"
 
-mainCommand = parseCommand(query,mainCommandList, bm.stringMatching)
-additionalCommand = parseCommand(query,additionalCommandList, bm.stringMatching)
-tasks = extractTask(query,jenisTaskDeadline,jenisTaskNormal,bm.stringMatching)
-nHariPekan = extractNHariPekan(query)
+# query = "bot, tambahin matkul IF2220 topik Regex deadlinenya 20/01/2021"
 
 
-print(isCommandOnlyX(mainCommand,"deadline", mainCommandList,bm.stringMatching))
-print(isTaskOnlyX(tasks,"jenis",attributeTask,bm.stringMatching))
 
-print("ini main command:", mainCommand)
-print("ini additional command:", additionalCommand)
-print("ini hasil ekstraksi N hari atau minggu:",nHariPekan)
-print("ini task:",tasks)
-print("Testing fungsi cocokin 2 command",isCommandOnlyXandY(mainCommand, "Deadline","Diundur", mainCommandList, bm.stringMatching))
-commandValidationTest(mainCommand, additionalCommand,mainCommandList,additionalCommandList, tasks, attributeTask,nHariPekan, bm.stringMatching)
+
+# mainCommand = parseCommand(query,mainCommandList, bm.stringMatching)
+# additionalCommand = parseCommand(query,additionalCommandList, bm.stringMatching)
+# tasks = extractTask(query,jenisTaskDeadline,jenisTaskNormal,bm.stringMatching)
+# nHariPekan = extractNHariPekan(query)
+
+
+# print(isCommandOnlyX(mainCommand,"deadline", mainCommandList,bm.stringMatching))
+# print(isTaskOnlyX(tasks,"jenis",attributeTask,bm.stringMatching))
+
+# print("ini main command:", mainCommand)
+# print("ini additional command:", additionalCommand)
+# print("ini hasil ekstraksi N hari atau minggu:",nHariPekan)
+# print("ini task:",tasks)
+# print("Testing fungsi cocokin 2 command",isCommandOnlyXandY(mainCommand, "Deadline","Diundur", mainCommandList, bm.stringMatching))
+# commandValidationTest(mainCommand, additionalCommand,mainCommandList,additionalCommandList, tasks, attributeTask,nHariPekan, bm.stringMatching)
 
 
 

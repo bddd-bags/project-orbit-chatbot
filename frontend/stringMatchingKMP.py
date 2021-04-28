@@ -1,10 +1,10 @@
 def checkSufPrefKMP(patternInput, i):
-    pattern = patternInput.lower()
+    pattern = patternInput.lower().strip()
     #Fungsi buat cek pasangan suffix dan prefix dalam algoritma KMP
     return (pattern[0:i] ==  pattern[len(pattern)-i:len(pattern)])
 
 def buildFail(patternInput):
-    pattern = patternInput.lower()
+    pattern = patternInput.lower().strip()
     #Fungsi preproses
     #Dipake buat bikin array yang isinya angka start algoritma KMP kalau ada mismatch
     result = [0 for i in range(len(pattern))]
@@ -19,8 +19,8 @@ def buildFail(patternInput):
     return result
 
 def stringMatching(textInput, patternInput):
-    text = textInput.lower()
-    pattern = patternInput.lower()
+    text = textInput.lower().strip()
+    pattern = patternInput.lower().strip()
     fail = buildFail(pattern)
     i = 0
     j = i
