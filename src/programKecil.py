@@ -490,6 +490,19 @@ def commandValidation(mainCommand,additionalCommand,mainCommandList, additionalC
         db.session.commit()
         return "Task "+ str(idx)+" telah ditandai selesai"
 
+    elif(isCommandOnlyX(mainCommand,"help",mainCommandList,stringMatching)):
+        return """  1. "(ID: #) dd/mm/yy - <matkul>- <jenis>- <topik>" untuk menambahkan agenda baru<br>
+                    2. Menampilkan agenda yang sudah tercatat<br>
+                        - DATE1 sampai DATE_2<br>
+                        - N minggu ke depan<br>
+                        - N hari ke depan<br>
+                        - Hari ini<br>
+                    3. <matkul> untuk menampilkan deadline dari matkul tersebut<br>
+                    4. <ID> <tanggal> untuk mengubah tanggal deadline task<br>
+                    5. selesai <ID> untuk menandai tugas sudah dikerjakan<br>
+                    6. help untuk memunculkan opsi kata penting yang digunakan<br>
+        """
+
     else:
         #perintah tidak dikenali
         print("Perintah kamu tidak dikenali!")
@@ -571,7 +584,7 @@ jenisTaskDeadline = ["Tubes","Tucil"]
 jenisTaskNormal = ["Praktikum","Ujian","Kuis"]
 attributeTask = ["id","matkul","jenis","topik","deadline","status"]
 
-mainCommandList = ["Deadline", "Diundur", "Selesai"]
+mainCommandList = ["Deadline", "Diundur", "Selesai", "Help"]
 additionalCommandList = ["Hari", "Minggu", "Hari Ini","Task"]
 
 
