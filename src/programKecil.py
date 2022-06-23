@@ -72,7 +72,7 @@ def parseQuery(query, kataPenting, validCommand, additionalCommand,stringMatchin
 def commandRecognition(query, commandDB):
     validCommand = [0 for i in range(len(commandDB))]
 
-    for keyword in query['validCommand']: #Kayanya ini perlu dibikin lebih dinamik
+    for keyword in query['validCommand']: 
         for i, command in enumerate(commandDB):
             if keyword == command:
                 validCommand[i] += 1
@@ -427,7 +427,7 @@ def commandValidation(mainCommand,additionalCommand,mainCommandList, additionalC
             if (filteredTask):
                 return taskDBToString(filteredTask)
             else:
-                return "Mantap pak bos, dari tanggal "+task["deadline"][0]+" sampai tanggal "+ task["deadline"][1]+" enggak ada deadline!"
+                return "Mantap pak bos, dari tanggal "+task["deadline"][0]+" sampai tanggal "+ task["deadline"][1]+" enggak ada deadline alias bisa REBAHAN!!!"
         elif(isCommandOnlyX(mainCommand,"deadline",mainCommandList,stringMatching) and len(nHariPekan) == 1):
             #2.b2
             if(isCommandOnlyX(additionalCommand,"hari",additionalCommandList,stringMatching)):
@@ -436,7 +436,7 @@ def commandValidation(mainCommand,additionalCommand,mainCommandList, additionalC
                     print("ini masuk case 2.b2")
                     return taskDBToString(filteredTask)
                 else:
-                    return "Mantap pak bos, "+str(nHariPekan[0])+" hari ke depan enggak ada deadline!"
+                    return "SELAMAT YAA!!!!, "+str(nHariPekan[0])+" hari ke depan BISA REBAHAN!!!!"
                 print("Case 2.b2! Jalankan fungsi menampilkan task N hari dari sekarang!")
             #2.b3
             if(isCommandOnlyX(additionalCommand,"minggu",additionalCommandList,stringMatching)):
@@ -445,7 +445,7 @@ def commandValidation(mainCommand,additionalCommand,mainCommandList, additionalC
                     print("ini masuk case 2.b3")
                     return taskDBToString(filteredTask)
                 else:
-                    return "Mantap pak bos, "+str(nHariPekan[0])+" minggu ke depan enggak ada deadline!"
+                    return "Mantap pak bos, "+str(nHariPekan[0])+" minggu ke depan enggak ada deadline alias bisa REBAHAN!!!!"
                 print("Case 2.b3! Jalankan fungsi menampilkan task N minggu dari sekarang!")
         #2.b4
         elif(isCommandOnlyX(additionalCommand,"hari ini",additionalCommandList,stringMatching)):
@@ -455,7 +455,7 @@ def commandValidation(mainCommand,additionalCommand,mainCommandList, additionalC
                 print("ini masuk case 2.b4")
                 return taskDBToString(filteredTask)
             else:
-                return "Mantap pak bos, hari ini enggak ada deadline!"
+                return "Mantap pak bos, hari ini enggak ada deadline, bisa REBAHAN!!!"
             print("Case 2.b4! Jalankan fungsi menampilkan task hari ini")
         
         #case 3
@@ -491,7 +491,7 @@ def commandValidation(mainCommand,additionalCommand,mainCommandList, additionalC
         return "Task "+ str(idx)+" telah ditandai selesai"
 
     elif(isCommandOnlyX(mainCommand,"help",mainCommandList,stringMatching)):
-        return """  1. "(ID: #) dd/mm/yy - <matkul>- <jenis>- <topik>" untuk menambahkan agenda baru<br>
+        return """  1. "(ID: #) tgl/bln/thn - <matkul>- <jenis>- <topik>" untuk menambahkan agenda baru<br>
                     2. Menampilkan agenda yang sudah tercatat<br>
                         - DATE1 sampai DATE_2<br>
                         - N minggu ke depan<br>
@@ -502,15 +502,18 @@ def commandValidation(mainCommand,additionalCommand,mainCommandList, additionalC
                     5. selesai <ID> untuk menandai tugas sudah dikerjakan<br>
                     6. help untuk memunculkan opsi kata penting yang digunakan<br>
         """
+    elif(isCommandOnlyX(mainCommand,"Halo",mainCommandList,stringMatching)):
+        return """ Halo, Selamat Datang di DutyBot, Kami siap membantu Anda
+        """
 
     else:
         #perintah tidak dikenali
         print("Perintah kamu tidak dikenali!")
         # return str(isDate1GreaterEQ("12/03/2021", "13/03/2021"))
-        return "waduh, botnya bingung bang. Coba ketik help deh!"
+        return "maaf, kami bingung dengan perkataan kamu, coba ketik help yaa!"
     print(task)
     print(additionalCommand)
-    return "Botnya bingung bang :(, coba ketik help ya biar perintahnya bisa dikenali!"
+    return "Botnya bingung kak :(, coba ketik help ya biar perintahnya bisa dikenali yaa"
 
 
 
@@ -584,7 +587,7 @@ jenisTaskDeadline = ["Tubes","Tucil"]
 jenisTaskNormal = ["Praktikum","Ujian","Kuis"]
 attributeTask = ["id","matkul","jenis","topik","deadline","status"]
 
-mainCommandList = ["Deadline", "Diundur", "Selesai", "Help"]
+mainCommandList = ["Deadline", "Diundur", "Selesai", "Help", "Halo"]
 additionalCommandList = ["Hari", "Minggu", "Hari Ini","Task"]
 
 

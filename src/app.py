@@ -46,7 +46,7 @@ def get_bot_response():
      jenisTaskNormal = ["Praktikum","Ujian","Kuis"]
      attributeTask = ["id","matkul","jenis","topik","deadline","status"]
 
-     mainCommandList = ["Deadline", "Diundur", "Selesai","Help"]
+     mainCommandList = ["Deadline", "Diundur","Selesai","Help","Halo"]
      additionalCommandList = ["Hari", "Minggu", "Hari Ini","Task"]
 
      query = request.args.get("msg") 
